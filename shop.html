@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop Inventory - Blake&Casper's 3D Hut</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="container"
+        style="padding: 2rem 1rem; display: flex; justify-content: space-between; align-items: center;">
+        <a href="index.html"
+            style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 700;">Blake&Casper's 3D Hut</a>
+        <div>
+            <a href="shop.html" style="margin-left: 2rem; color: var(--color-primary);">Shop</a>
+            <a href="about.html" style="margin-left: 2rem;">About</a>
+            <a href="cart.html" style="margin-left: 2rem;">Cart (0)</a>
+        </div>
+    </nav>
+
+    <main class="container" style="padding-top: 4rem;">
+        <header style="text-align: center; margin-bottom: 4rem;">
+            <h1 style="font-size: 3rem; margin-bottom: 1rem;">Our Collection</h1>
+            <p style="color: var(--color-text-muted);">Browse our full inventory of 3D printed wonders.</p>
+        </header>
+
+        <div id="shop-grid"
+            style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 2rem; margin-bottom: 6rem;">
+            <!-- Populated by JS -->
+        </div>
+    </main>
+
+    <script src="js/data.js"></script>
+    <script src="js/cart.js"></script>
+    <script src="js/shop.js"></script>
+</body>
+
+</html>

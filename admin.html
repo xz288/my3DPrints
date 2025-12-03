@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Blake&Casper's 3D Hut</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 2rem;
+        }
+
+        .admin-table th,
+        .admin-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .admin-table th {
+            background: var(--color-surface);
+            font-weight: 600;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .status-shipped {
+            background: #d1fae5;
+            color: #059669;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="container"
+        style="padding: 2rem 1rem; display: flex; justify-content: space-between; align-items: center;">
+        <a href="index.html"
+            style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 700;">Blake&Casper's 3D Hut</a>
+        <div>
+            <span style="color: var(--color-primary); font-weight: 600;">Admin Dashboard</span>
+        </div>
+    </nav>
+
+    <main class="container" style="padding-top: 4rem; max-width: 1000px; margin: 0 auto;">
+
+        <!-- Login Section -->
+        <div id="login-section"
+            style="max-width: 400px; margin: 4rem auto; padding: 2rem; background: var(--color-surface); border-radius: 1rem; text-align: center;">
+            <h1 style="margin-bottom: 2rem;">Admin Login</h1>
+            <form id="login-form" style="display: grid; gap: 1rem;">
+                <input type="text" id="username" placeholder="Username" required
+                    style="padding: 0.75rem; border: 1px solid var(--color-border); border-radius: 0.5rem; background: var(--color-bg); color: var(--color-text);">
+                <input type="password" id="password" placeholder="Password" required
+                    style="padding: 0.75rem; border: 1px solid var(--color-border); border-radius: 0.5rem; background: var(--color-bg); color: var(--color-text);">
+                <button type="submit" class="btn" style="width: 100%;">Login</button>
+            </form>
+        </div>
+
+        <!-- Dashboard Section (Hidden by default) -->
+        <div id="dashboard-section" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h1 style="font-size: 2.5rem;">Admin Dashboard</h1>
+                <button onclick="logout()" class="btn"
+                    style="background: var(--color-surface); color: var(--color-text);">Logout</button>
+            </div>
+
+            <!-- Tabs -->
+            <div style="display: flex; gap: 1rem; margin-bottom: 2rem; border-bottom: 1px solid var(--color-border);">
+                <button onclick="switchTab('orders')" id="tab-orders"
+                    style="padding: 1rem 2rem; background: transparent; border: none; border-bottom: 2px solid var(--color-primary); color: var(--color-primary); font-weight: 600; cursor: pointer;">Orders</button>
+                <button onclick="switchTab('products')" id="tab-products"
+                    style="padding: 1rem 2rem; background: transparent; border: none; border-bottom: 2px solid transparent; color: var(--color-text-muted); font-weight: 600; cursor: pointer;">Products</button>
+            </div>
+
+            <!-- Orders View -->
+            <div id="view-orders">
+                <!-- Controls -->
+                <div
+                    style="background: var(--color-surface); padding: 1.5rem; border-radius: 1rem; margin-bottom: 2rem; display: flex; gap: 1rem; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 200px;">
+                        <label style="display: block; margin-bottom: 0.5rem; font-size: 0.9rem;">Filter by
+                            Status</label>
+                        <select id="filter-status" onchange="renderOrders()"
+                            style="width: 100%; padding: 0.5rem; border-radius: 0.5rem; border: 1px solid var(--color-border); background: var(--color-bg); color: var(--color-text);">
+                            <option value="All">All Statuses</option>
+                            <option value="Pending">Pending</option>
+                            <option value="Shipped">Shipped</option>
+                        </select>
+                    </div>
+                    <div style="flex: 1; min-width: 200px;">
+                        <label style="display: block; margin-bottom: 0.5rem; font-size: 0.9rem;">Sort by</label>
+                        <select id="sort-by" onchange="renderOrders()"
+                            style="width: 100%; padding: 0.5rem; border-radius: 0.5rem; border: 1px solid var(--color-border); background: var(--color-bg); color: var(--color-text);">
+                            <option value="date-new">Date: Newest First</option>
+                            <option value="date-old">Date: Oldest First</option>
+                            <option value="total-high">Total: High to Low</option>
+                            <option value="total-low">Total: Low to High</option>
+                        </select>
+                    </div>
+                    <div style="flex: 0 0 auto; display: flex; align-items: flex-end;">
+                        <button onclick="resetData()"
+                            style="padding: 0.5rem 1rem; background: #ef4444; color: white; border: none; border-radius: 0.5rem; cursor: pointer;">Reset
+                            Data</button>
+                    </div>
+                </div>
+
+                <div style="background: var(--color-surface); border-radius: 1rem; overflow: hidden;">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="background: rgba(255,255,255,0.05); text-align: left;">
+                                <th style="padding: 1rem;">Order ID</th>
+                                <th style="padding: 1rem;">Date</th>
+                                <th style="padding: 1rem;">Customer</th>
+                                <th style="padding: 1rem;">Items</th>
+                                <th style="padding: 1rem;">Total</th>
+                                <th style="padding: 1rem;">Status</th>
+                                <th style="padding: 1rem;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="orders-table-body">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Products View -->
+            <div id="view-products" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem;">
+                    <!-- Product Filters -->
+                    <div style="display: flex; gap: 1rem; flex-wrap: wrap; flex: 1; margin-right: 2rem;">
+                        <div style="flex: 1; min-width: 150px;">
+                            <label style="display: block; margin-bottom: 0.5rem; font-size: 0.9rem;">Status</label>
+                            <select id="filter-prod-status" onchange="renderProducts()"
+                                style="width: 100%; padding: 0.5rem; border-radius: 0.5rem; border: 1px solid var(--color-border); background: var(--color-bg); color: var(--color-text);">
+                                <option value="All">All</option>
+                                <option value="Active" selected>Active</option>
+                                <option value="Deleted">Deleted</option>
+                            </select>
+                        </div>
+                        <div style="flex: 1; min-width: 150px;">
+                            <label style="display: block; margin-bottom: 0.5rem; font-size: 0.9rem;">Category</label>
+                            <input type="text" id="filter-prod-category" oninput="renderProducts()"
+                                placeholder="Any Category"
+                                style="width: 100%; padding: 0.5rem; border-radius: 0.5rem; border: 1px solid var(--color-border); background: var(--color-bg); color: var(--color-text);">
+                        </div>
+                        <div style="flex: 1; min-width: 150px;">
+                            <label style="display: block; margin-bottom: 0.5rem; font-size: 0.9rem;">Max Price</label>
+                            <input type="number" id="filter-prod-price" oninput="renderProducts()"
+                                placeholder="Any Price"
+                                style="width: 100%; padding: 0.5rem; border-radius: 0.5rem; border: 1px solid var(--color-border); background: var(--color-bg); color: var(--color-text);">
+                        </div>
+                    </div>
+
+                    <button onclick="openProductModal()" class="btn" style="height: fit-content;">Add New
+                        Product</button>
+                </div>
+
+                <div style="background: var(--color-surface); border-radius: 1rem; overflow: hidden;">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="background: rgba(255,255,255,0.05); text-align: left;">
+                                <th style="padding: 1rem;">Image</th>
+                                <th style="padding: 1rem;">Title</th>
+                                <th style="padding: 1rem;">Price</th>
+                                <th style="padding: 1rem;">Category</th>
+                                <th style="padding: 1rem;">Status</th>
+                                <th style="padding: 1rem;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="products-table-body">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Modal -->
+        <div id="product-modal"
+            style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center;">
+            <div
+                style="background: var(--color-surface); padding: 2rem; border-radius: 1rem; width: 90%; max-width: 500px;">
+                <h2 id="modal-title" style="margin-bottom: 1.5rem;">Add Product</h2>
+                <form id="product-form" style="display: grid; gap: 1rem;">
+                    <input type="hidden" id="prod-id">
+
+                    <div>
+                        <label style="display: block; margin-bottom: 0.5rem;">Title</label>
+                        <input type="text" id="prod-title" required
+                            style="width: 100%; padding: 0.75rem; border-radius: 0.5rem; border: 1px solid var(--color-border); background: var(--color-bg); color: var(--color-text);">
+                    </div>
+
+                    <div>
+                        <label style="display: block; margin-bottom: 0.5rem;">Price ($)</label>
+                        <input type="number" id="prod-price" step="0.01" required
+                            style="width: 100%; padding: 0.75rem; border-radius: 0.5rem; border: 1px solid var(--color-border); background: var(--color-bg); color: var(--color-text);">
+                    </div>
+
+                    <div>
+                        <label style="display: block; margin-bottom: 0.5rem;">Category</label>
+                        <input type="text" id="prod-category" required
+                            style="width: 100%; padding: 0.75rem; border-radius: 0.5rem; border: 1px solid var(--color-border); background: var(--color-bg); color: var(--color-text);">
+                    </div>
+
+                    <div>
+                        <label style="display: block; margin-bottom: 0.5rem;">Description</label>
+                        <textarea id="prod-desc" rows="3" required
+                            style="width: 100%; padding: 0.75rem; border-radius: 0.5rem; border: 1px solid var(--color-border); background: var(--color-bg); color: var(--color-text);"></textarea>
+                    </div>
+
+                    <div>
+                        <label style="display: block; margin-bottom: 0.5rem;">Image (Emoji or URL)</label>
+                        <input type="text" id="prod-image" placeholder="Enter emoji (e.g. 🦖) or Image URL"
+                            style="width: 100%; padding: 0.75rem; border-radius: 0.5rem; border: 1px solid var(--color-border); background: var(--color-bg); color: var(--color-text);">
+                    </div>
+
+                    <div
+                        style="text-align: center; font-size: 0.9rem; color: var(--color-text-muted); margin: 0.5rem 0;">
+                        - OR -</div>
+
+                    <div>
+                        <label style="display: block; margin-bottom: 0.5rem;">Upload Image (Max 500KB)</label>
+                        <input type="file" id="prod-image-file" accept="image/*"
+                            style="width: 100%; padding: 0.75rem; border-radius: 0.5rem; border: 1px solid var(--color-border); background: var(--color-bg); color: var(--color-text);">
+                    </div>
+
+                    <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                        <button type="button" onclick="closeProductModal()"
+                            style="flex: 1; padding: 0.75rem; background: transparent; border: 1px solid var(--color-border); color: var(--color-text); border-radius: 0.5rem; cursor: pointer;">Cancel</button>
+                        <button type="submit" class="btn" style="flex: 1;">Save Product</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </main>
+
+    <script src="js/data.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+
+</html>

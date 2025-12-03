@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Cart - Blake&Casper's 3D Hut</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="container"
+        style="padding: 2rem 1rem; display: flex; justify-content: space-between; align-items: center;">
+        <a href="index.html"
+            style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 700;">Blake&Casper's 3D Hut</a>
+        <div>
+            <a href="shop.html" style="margin-left: 2rem;">Shop</a>
+            <a href="about.html" style="margin-left: 2rem;">About</a>
+            <a href="cart.html" style="margin-left: 2rem;">Cart (0)</a>
+        </div>
+    </nav>
+
+    <main class="container" style="padding-top: 4rem; max-width: 800px; margin: 0 auto;">
+        <h1 style="font-size: 2.5rem; margin-bottom: 2rem;">Your Cart</h1>
+
+        <div id="cart-items" style="margin-bottom: 3rem;">
+            <!-- Populated by JS -->
+            <p style="padding: 3rem; text-align: center; color: var(--color-text-muted);">Loading cart...</p>
+        </div>
+
+        <div style="background: var(--color-surface); padding: 2rem; border-radius: 1rem;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 1rem; font-size: 1.2rem;">
+                <span>Subtotal</span>
+                <span id="cart-subtotal">$0.00</span>
+            </div>
+            <div
+                style="display: flex; justify-content: space-between; margin-bottom: 2rem; font-size: 1.5rem; font-weight: 700;">
+                <span>Total</span>
+                <span id="cart-total">$0.00</span>
+            </div>
+
+            <!-- Checkout Section -->
+            <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--color-border);">
+                <h2 style="margin-bottom: 1.5rem;">Checkout</h2>
+
+                <!-- Shipping Form -->
+                <div style="margin-bottom: 2rem;">
+                    <h3 style="margin-bottom: 1rem; font-size: 1.2rem;">Shipping Information</h3>
+                    <form id="shipping-form" style="display: grid; gap: 1rem;">
+                        <input type="text" id="ship-name" placeholder="Full Name" required
+                            style="padding: 0.75rem; border: 1px solid var(--color-border); border-radius: 0.5rem; background: var(--color-bg); color: var(--color-text);">
+                        <input type="text" id="ship-address" placeholder="Address" required
+                            style="padding: 0.75rem; border: 1px solid var(--color-border); border-radius: 0.5rem; background: var(--color-bg); color: var(--color-text);">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+                            <input type="text" id="ship-city" placeholder="City" required
+                                style="padding: 0.75rem; border: 1px solid var(--color-border); border-radius: 0.5rem; background: var(--color-bg); color: var(--color-text);">
+                            <input type="text" id="ship-state" placeholder="State" required
+                                style="padding: 0.75rem; border: 1px solid var(--color-border); border-radius: 0.5rem; background: var(--color-bg); color: var(--color-text);">
+                            <input type="text" id="ship-zip" placeholder="ZIP Code" required
+                                style="padding: 0.75rem; border: 1px solid var(--color-border); border-radius: 0.5rem; background: var(--color-bg); color: var(--color-text);">
+                        </div>
+                    </form>
+
+                    <!-- Mock Checkout Button -->
+                    <button id="place-order-btn" class="btn"
+                        style="width: 100%; padding: 1rem; font-size: 1.2rem; margin-top: 1rem;">Place Order
+                        (Mock)</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/data.js"></script>
+    <script src="js/cart.js"></script>
+
+    <script>
+        document.getElementById('place-order-btn').addEventListener('click', function () {
+            const form = document.getElementById('shipping-form');
+
+            // Basic HTML Validation
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            // Strict Validation
+            const name = document.getElementById('ship-name').value.trim();
+            const address = document.getElementById('ship-address').value.trim();
+            const city = document.getElementById('ship-city').value.trim();
+            const state = document.getElementById('ship-state').value.trim().toUpperCase();
+            const zip = document.getElementById('ship-zip').value.trim();
+
+            // 1. Address: Must start with a number (e.g., "123 Main St")
+            if (!/^\d+\s+.+/.test(address)) {
+                alert('Please enter a valid address starting with a street number (e.g., "123 Main St").');
+                return;
+            }
+
+            // 2. City: Letters and spaces only
+            if (!/^[a-zA-Z\s]+$/.test(city)) {
+                alert('Please enter a valid city name (letters only).');
+                return;
+            }
+
+            // 3. State: Valid 2-letter US Code
+            const validStates = [
+                'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA',
+                'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD',
+                'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ',
+                'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC',
+                'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY'
+            ];
+            if (!validStates.includes(state)) {
+                alert('Please enter a valid 2-letter US State code (e.g., CA, NY). We only ship within the US.');
+                return;
+            }
+
+            // 4. ZIP: Exactly 5 digits
+            if (!/^\d{5}$/.test(zip)) {
+                alert('Please enter a valid 5-digit ZIP code.');
+                return;
+            }
+
+            // Capture Shipping Info
+            const shippingInfo = {
+                name: name,
+                address: address,
+                city: city,
+                state: state,
+                zip: zip
+            };
+
+            // Create Order Object
+            const order = {
+                id: Date.now().toString(),
+                date: new Date().toLocaleString(),
+                customer: shippingInfo,
+                items: getCart(),
+                total: getCartTotal().toFixed(2),
+                status: 'Pending',
+                paymentId: 'MOCK_PAYMENT_' + Date.now()
+            };
+
+            // Save Order
+            const orders = JSON.parse(localStorage.getItem('caspers_3d_hut_orders') || '[]');
+            orders.push(order);
+            localStorage.setItem('caspers_3d_hut_orders', JSON.stringify(orders));
+
+            alert('Order placed successfully! (Mock Payment)');
+
+            // Clear cart after successful purchase
+            localStorage.removeItem('caspers_3d_hut_cart');
+            window.location.href = 'index.html';
+        });
+    </script>
+
+</body>
+
+</html>
