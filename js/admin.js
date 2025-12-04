@@ -212,12 +212,15 @@ async function renderProducts() {
 }
 
 // Modal Logic
+let currentImages = ['', '', '', '']; // Store current images for the modal
+
 async function openProductModal(productId = null) {
     const modal = document.getElementById('product-modal');
     const title = document.getElementById('modal-title');
     const form = document.getElementById('product-form');
 
     modal.style.display = 'flex';
+    currentImages = ['', '', '', '']; // Reset images
 
     if (productId) {
         // Edit Mode
@@ -229,17 +232,103 @@ async function openProductModal(productId = null) {
         document.getElementById('prod-price').value = parseFloat(p.price.replace('$', ''));
         document.getElementById('prod-category').value = p.category;
         document.getElementById('prod-desc').value = p.desc;
-        document.getElementById('prod-image').value = p.images[0];
+
+        // Load existing images
+        if (p.images && Array.isArray(p.images)) {
+            p.images.forEach((img, i) => {
+                if (i < 4) currentImages[i] = img;
+            });
+        }
     } else {
         // Add Mode
         title.textContent = 'Add New Product';
         form.reset();
         document.getElementById('prod-id').value = '';
     }
+
+    renderImageSlots();
 }
 
 function closeProductModal() {
     document.getElementById('product-modal').style.display = 'none';
+}
+
+function renderImageSlots() {
+    const grid = document.getElementById('image-grid');
+    grid.innerHTML = '';
+
+    currentImages.forEach((img, index) => {
+        const slot = document.createElement('div');
+        slot.style.border = '1px dashed var(--color-border)';
+        slot.style.borderRadius = '0.5rem';
+        slot.style.height = '150px';
+        slot.style.display = 'flex';
+        slot.style.flexDirection = 'column';
+        slot.style.justifyContent = 'center';
+        slot.style.alignItems = 'center';
+        slot.style.position = 'relative';
+        slot.style.overflow = 'hidden';
+        slot.style.background = 'var(--color-bg)';
+
+        if (img) {
+            // Filled State
+            if (img.startsWith('data:') || img.startsWith('http')) {
+                slot.innerHTML = `
+                    <img src="${img}" style="width: 100%; height: 100%; object-fit: cover;">
+                    <button type="button" onclick="removeImage(${index})" 
+                        style="position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.6); color: white; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center;">&times;</button>
+                `;
+            } else {
+                // Emoji
+                slot.innerHTML = `
+                    <div style="font-size: 4rem;">${img}</div>
+                    <button type="button" onclick="removeImage(${index})" 
+                        style="position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.6); color: white; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center;">&times;</button>
+                `;
+            }
+        } else {
+            // Empty State
+            slot.innerHTML = `
+                <div style="text-align: center; width: 100%; padding: 0.5rem;">
+                    <button type="button" onclick="document.getElementById('file-input-${index}').click()" 
+                        style="background: var(--color-surface); border: 1px solid var(--color-border); padding: 0.25rem 0.5rem; border-radius: 0.25rem; cursor: pointer; margin-bottom: 0.5rem; font-size: 0.8rem;">Upload</button>
+                    <input type="file" id="file-input-${index}" accept="image/*" style="display: none;" onchange="handleFileUpload(${index}, this)">
+                    <div style="font-size: 0.8rem; color: var(--color-text-muted); margin-bottom: 0.25rem;">- OR -</div>
+                    <input type="text" placeholder="URL/Emoji" onchange="handleUrlInput(${index}, this.value)"
+                        style="width: 80%; padding: 0.25rem; border: 1px solid var(--color-border); border-radius: 0.25rem; background: var(--color-surface); color: var(--color-text); font-size: 0.8rem; text-align: center;">
+                </div>
+            `;
+        }
+        grid.appendChild(slot);
+    });
+}
+
+function removeImage(index) {
+    currentImages[index] = '';
+    renderImageSlots();
+}
+
+function handleUrlInput(index, value) {
+    if (value.trim()) {
+        currentImages[index] = value.trim();
+        renderImageSlots();
+    }
+}
+
+function handleFileUpload(index, input) {
+    const file = input.files[0];
+    if (file) {
+        if (file.size > 500 * 1024) {
+            alert('Image is too large! Max 500KB.');
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            currentImages[index] = e.target.result;
+            renderImageSlots();
+        };
+        reader.readAsDataURL(file);
+    }
 }
 
 // Handle Form Submit
@@ -251,46 +340,32 @@ document.getElementById('product-form').addEventListener('submit', async functio
     const price = parseFloat(document.getElementById('prod-price').value).toFixed(2);
     const category = document.getElementById('prod-category').value;
     const desc = document.getElementById('prod-desc').value;
-    const imageText = document.getElementById('prod-image').value;
-    const imageFile = document.getElementById('prod-image-file').files[0];
 
-    const saveProductData = async (imageUrl) => {
-        const productData = {
-            title: title,
-            price: '$' + price,
-            desc: desc,
-            images: [imageUrl],
-            category: category,
-            deleted: false
-        };
+    // Filter out empty images
+    const validImages = currentImages.filter(img => img !== '');
 
-        try {
-            await saveProduct(id, productData);
-            closeProductModal();
-            await renderProducts();
-            alert('Product saved successfully!');
-        } catch (error) {
-            alert('Failed to save product');
-        }
+    if (validImages.length === 0) {
+        alert('Please provide at least one image.');
+        return;
+    }
+
+    const productData = {
+        title: title,
+        price: '$' + price,
+        desc: desc,
+        images: validImages,
+        category: category,
+        deleted: false
     };
 
-    if (imageFile) {
-        // Handle File Upload
-        if (imageFile.size > 500 * 1024) { // 500KB limit
-            alert('File is too large! Please upload an image smaller than 500KB.');
-            return;
-        }
-
-        const reader = new FileReader();
-        reader.onload = function (e) {
-            saveProductData(e.target.result);
-        };
-        reader.readAsDataURL(imageFile);
-    } else if (imageText) {
-        // Handle Text/URL
-        await saveProductData(imageText);
-    } else {
-        alert('Please provide an image (Emoji, URL, or File).');
+    try {
+        await saveProduct(id, productData);
+        closeProductModal();
+        await renderProducts();
+        alert('Product saved successfully!');
+    } catch (error) {
+        alert('Failed to save product');
+        console.error(error);
     }
 });
 

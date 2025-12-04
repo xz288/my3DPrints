@@ -36,32 +36,56 @@
             background: var(--color-surface);
             border-radius: 0.5rem;
             cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2rem;
+            overflow: hidden;
+            border: 2px solid transparent;
+            transition: border-color var(--transition-fast);
+        }
 
-            .comment {
-                border-bottom: 1px solid var(--color-border);
-                padding: 1.5rem 0;
+        .thumb.active {
+            border-color: var(--color-primary);
+        }
+
+        .main-image {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 10rem;
+            background: var(--color-surface);
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+
+        .comment {
+            border-bottom: 1px solid var(--color-border);
+            padding: 1.5rem 0;
+        }
+
+        .comment:last-child {
+            border-bottom: none;
+        }
+
+        @media (max-width: 768px) {
+            .product-grid {
+                grid-template-columns: 1fr;
             }
 
-            .comment:last-child {
-                border-bottom: none;
+            .gallery-container {
+                grid-template-columns: 1fr;
+                grid-template-rows: 1fr 80px;
+                height: auto;
             }
 
-            @media (max-width: 768px) {
-                .product-grid {
-                    grid-template-columns: 1fr;
-                }
-
-                .gallery-container {
-                    grid-template-columns: 1fr;
-                    grid-template-rows: 1fr 80px;
-                    height: auto;
-                }
-
-                .thumbnails {
-                    flex-direction: row;
-                    order: 2;
-                }
+            .thumbnails {
+                flex-direction: row;
+                order: 2;
             }
+        }
     </style>
 </head>
 

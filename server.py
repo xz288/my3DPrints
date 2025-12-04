@@ -111,7 +111,7 @@ class APIHandler(SimpleHTTPRequestHandler):
                 'price': row[2],
                 'category': row[3],
                 'desc': row[4],
-                'images': [row[5]],
+                'images': json.loads(row[5]) if row[5].startswith('["') else [row[5]],
                 'deleted': bool(row[6])
             }
         
@@ -132,7 +132,7 @@ class APIHandler(SimpleHTTPRequestHandler):
         c.execute('''INSERT OR REPLACE INTO products 
                      VALUES (?, ?, ?, ?, ?, ?, ?)''',
                   (product['id'], product['title'], product['price'],
-                   product['category'], product['desc'], product['images'][0],
+                   product['category'], product['desc'], json.dumps(product['images']),
                    int(product.get('deleted', False))))
         
         conn.commit()

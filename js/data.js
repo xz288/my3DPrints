@@ -1,6 +1,8 @@
 // API-based Product Data Management
 
-const API_BASE = 'http://localhost:8000/api';
+const API_BASE = window.location.protocol === 'file:'
+    ? 'http://localhost:8000/api'
+    : '/api';
 
 // Fetch products from API
 async function getProducts() {
