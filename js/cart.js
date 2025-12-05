@@ -161,15 +161,15 @@ let products = {};
 document.addEventListener('DOMContentLoaded', async () => {
     updateCartCount();
 
-    // Fetch products first
-    products = await getProducts();
-
-    renderCart();
-
     const placeOrderBtn = document.getElementById('place-order-btn');
     if (placeOrderBtn) {
         placeOrderBtn.addEventListener('click', placeOrder);
     }
+
+    // Fetch products first
+    products = await getProducts();
+
+    renderCart();
 });
 
 async function placeOrder() {
@@ -183,6 +183,7 @@ async function placeOrder() {
 
     // Strict Validation
     const name = document.getElementById('ship-name').value.trim();
+    const email = document.getElementById('ship-email').value.trim();
     const address = document.getElementById('ship-address').value.trim();
     const city = document.getElementById('ship-city').value.trim();
     const state = document.getElementById('ship-state').value.trim().toUpperCase();
@@ -222,6 +223,7 @@ async function placeOrder() {
     // Capture Shipping Info
     const shippingInfo = {
         name: name,
+        email: email,
         address: address,
         city: city,
         state: state,

@@ -97,6 +97,7 @@ async function renderOrders() {
             <td style="padding: 1rem;">#${order.id.slice(-6)}</td>
             <td style="padding: 1rem;">${order.date}</td>
             <td style="padding: 1rem;">${customerInfo}</td>
+            <td style="padding: 1rem;">${order.customer.email || '-'}</td>
             <td style="padding: 1rem;">${itemsList}</td>
             <td style="padding: 1rem;">$${order.total}</td>
             <td style="padding: 1rem;">

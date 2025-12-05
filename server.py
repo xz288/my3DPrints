@@ -223,6 +223,21 @@ class APIHandler(SimpleHTTPRequestHandler):
         
         conn = sqlite3.connect(DB_FILE)
         c = conn.cursor()
+        
+        # If status is changing to Shipped, fetch order details first
+        if data['status'] == 'Shipped':
+            c.execute('SELECT customer_json FROM orders WHERE id = ?', (order_id,))
+            result = c.fetchone()
+            if result:
+                customer = json.loads(result[0])
+                email = customer.get('email', 'No email provided')
+                print(f"\n--- SENDING EMAIL TO {email} ---")
+                print(f"Subject: Your order #{order_id} has shipped!")
+                print(f"Dear {customer.get('name', 'Customer')},")
+                print("Your order has been shipped and will arrive within a week.")
+                print("Thank you for shopping with us!")
+                print("-----------------------------------\n")
+
         c.execute('UPDATE orders SET status = ? WHERE id = ?', 
                   (data['status'], order_id))
         conn.commit()
