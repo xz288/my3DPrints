@@ -198,6 +198,7 @@ async function renderProducts() {
             <td style="padding: 1rem; font-size: 2rem;">
                 ${p.images[0].startsWith('data:') ? `<img src="${p.images[0]}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 0.5rem;">` : p.images[0]}
             </td>
+            <td style="padding: 1rem; font-family: monospace; font-size: 0.9rem;">${id}</td>
             <td style="padding: 1rem; font-weight: 600;">${p.title}</td>
             <td style="padding: 1rem;">${p.price}</td>
             <td style="padding: 1rem;">${p.category}</td>

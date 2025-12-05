@@ -154,8 +154,100 @@ function renderCart() {
     if (cartSubtotalElement) cartSubtotalElement.textContent = formattedTotal;
 }
 
+// Global products cache
+let products = {};
+
 // Initialize
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     updateCartCount();
+
+    // Fetch products first
+    products = await getProducts();
+
     renderCart();
+
+    const placeOrderBtn = document.getElementById('place-order-btn');
+    if (placeOrderBtn) {
+        placeOrderBtn.addEventListener('click', placeOrder);
+    }
 });
+
+async function placeOrder() {
+    const form = document.getElementById('shipping-form');
+
+    // Basic HTML Validation
+    if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+    }
+
+    // Strict Validation
+    const name = document.getElementById('ship-name').value.trim();
+    const address = document.getElementById('ship-address').value.trim();
+    const city = document.getElementById('ship-city').value.trim();
+    const state = document.getElementById('ship-state').value.trim().toUpperCase();
+    const zip = document.getElementById('ship-zip').value.trim();
+
+    // 1. Address: Must start with a number (e.g., "123 Main St")
+    if (!/^\d+\s+.+/.test(address)) {
+        alert('Please enter a valid address starting with a street number (e.g., "123 Main St").');
+        return;
+    }
+
+    // 2. City: Letters and spaces only
+    if (!/^[a-zA-Z\s]+$/.test(city)) {
+        alert('Please enter a valid city name (letters only).');
+        return;
+    }
+
+    // 3. State: Valid 2-letter US Code
+    const validStates = [
+        'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA',
+        'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD',
+        'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ',
+        'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC',
+        'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY'
+    ];
+    if (!validStates.includes(state)) {
+        alert('Please enter a valid 2-letter US State code (e.g., CA, NY). We only ship within the US.');
+        return;
+    }
+
+    // 4. ZIP: Exactly 5 digits
+    if (!/^\d{5}$/.test(zip)) {
+        alert('Please enter a valid 5-digit ZIP code.');
+        return;
+    }
+
+    // Capture Shipping Info
+    const shippingInfo = {
+        name: name,
+        address: address,
+        city: city,
+        state: state,
+        zip: zip
+    };
+
+    // Create Order Object
+    const order = {
+        id: crypto.randomUUID(),
+        date: new Date().toLocaleString(),
+        customer: shippingInfo,
+        items: getCart(),
+        total: getCartTotal().toFixed(2),
+        status: 'Pending',
+        paymentId: 'MOCK_PAYMENT_' + Date.now()
+    };
+
+    try {
+        await saveOrder(order);
+        alert('Order placed successfully! (Mock Payment)');
+
+        // Clear cart after successful purchase
+        localStorage.removeItem(CART_KEY);
+        window.location.href = 'index.html';
+    } catch (error) {
+        alert('Failed to place order. Please try again.');
+        console.error(error);
+    }
+}

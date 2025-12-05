@@ -24,6 +24,7 @@ async function initProductPage() {
 
     if (currentProduct) {
         // Set Info
+        document.getElementById('product-id-display').textContent = `ID: ${productId}`;
         titleEl.textContent = currentProduct.title;
         priceEl.textContent = currentProduct.price;
         descEl.textContent = currentProduct.desc;

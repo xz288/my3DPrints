@@ -40,10 +40,10 @@ def init_db():
     if count == 0:
         # Default products
         default_products = [
-            ('1', 'T-Rex Figurine', '$24.99', 'Toys', 'A detailed 3D printed T-Rex figurine.', '🦖', 0),
-            ('2', 'Custom Phone Stand', '$12.99', 'Accessories', 'Ergonomic phone stand for your desk.', '📱', 0),
-            ('3', 'Gear Keychain', '$8.99', 'Accessories', 'A functional gear keychain.', '⚙️', 0),
-            ('4', 'Mini Planters', '$15.99', 'Home Decor', 'Set of 3 small planters for succulents.', '🌵', 0),
+            ('1701720000001', 'T-Rex Figurine', '$24.99', 'Toys', 'A detailed 3D printed T-Rex figurine.', '🦖', 0),
+            ('1701720000002', 'Custom Phone Stand', '$12.99', 'Accessories', 'Ergonomic phone stand for your desk.', '📱', 0),
+            ('1701720000003', 'Gear Keychain', '$8.99', 'Accessories', 'A functional gear keychain.', '⚙️', 0),
+            ('1701720000004', 'Mini Planters', '$15.99', 'Home Decor', 'Set of 3 small planters for succulents.', '🌵', 0),
         ]
         
         c.executemany(
@@ -236,8 +236,8 @@ class APIHandler(SimpleHTTPRequestHandler):
 if __name__ == '__main__':
     init_db()
     print('Initializing database...')
-    print('Starting server on http://localhost:8000')
+    print('Starting server on http://localhost:8001')
     print('Press Ctrl+C to stop the server')
     
-    server = HTTPServer(('localhost', 8000), APIHandler)
+    server = HTTPServer(('localhost', 8001), APIHandler)
     server.serve_forever()

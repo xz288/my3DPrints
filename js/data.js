@@ -1,7 +1,7 @@
 // API-based Product Data Management
 
 const API_BASE = window.location.protocol === 'file:'
-    ? 'http://localhost:8000/api'
+    ? 'http://localhost:8001/api'
     : '/api';
 
 // Fetch products from API
